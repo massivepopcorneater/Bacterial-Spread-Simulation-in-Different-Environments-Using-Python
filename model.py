@@ -60,22 +60,6 @@ class BacteriaModel(mesa.Model):
         )
         self.datacollector.collect(self)
  
-    def _diffuse(self, grid, diffusion_rate, decay_rate=0.0, replenish_rate=0.0, max_val=None):
-        """
-        Spreads nutrients across the grid using Fick's second law.
-        Each cell moves toward the average of its 4 neighbours.
-        """
-        padded = np.pad(grid, 1, mode='edge')
-        neighbor_avg = (
-            padded[:-2, 1:-1] +
-            padded[2:,  1:-1] +
-            padded[1:-1, :-2] +
-            padded[1:-1,  2:]
-        ) / 4.0
- 
-        result = grid + diffusion_rate * (neighbor_avg - grid) - decay_rate * grid + replenish_rate
-        result = np.clip(result, 0, max_val if max_val is not None else np.inf)
-        return result
  
     def step(self):
         # All bacteria take their turn in random order
@@ -102,12 +86,4 @@ class BacteriaModel(mesa.Model):
             arr[x][y] = len(cell_content)
         return arr
  
-    def add_bacteria(self, strain, n=10):
-        placed = 0
-        while placed < n:
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-            if self.grid.is_cell_empty((x, y)):
-                b = BacteriaAgent(self, strain=strain)
-                self.grid.place_agent(b, (x, y))
-                placed += 1
+
