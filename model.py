@@ -5,7 +5,7 @@ from mesa.datacollection import DataCollector
 from agent import BacteriaAgent, STRAINS
 
 
-# --- Helper functions for data collection ---
+# Data
 
 def count_strain(model, name):
     total = 0
@@ -24,7 +24,7 @@ def avg_nutrients(model):
     return float(np.mean(model.nutrients))
 
 
-# --- The main simulation model ---
+# Simulation model
 
 class BacteriaModel(mesa.Model):
 
@@ -37,7 +37,7 @@ class BacteriaModel(mesa.Model):
         self.ph          = ph
         self.step_count  = 0
 
-        # Nutrient grid — starts at 100 everywhere (full petri dish)
+        # Nutrient grid 
         self.nutrients = np.full((width, height), 100.0)
 
         # Place bacteria in a random cluster around the centre

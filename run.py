@@ -32,15 +32,15 @@ fig = plt.figure(figsize=(14, 8))
 fig.canvas.manager.set_window_title("Bacteria Simulation")
 fig.patch.set_facecolor("#1a1a2e")
 
-# Left panel - petri dish
+# Simulation
 ax_dish = fig.add_axes([0.03, 0.28, 0.42, 0.65])
 ax_dish.set_facecolor("#050510")
-ax_dish.set_title("Petri Dish  (green = bacteria · red dots = nutrient depletion)",
+ax_dish.set_title("Petri Dish  (green = bacteria, red dots = food)",
                    color="white", fontsize=9)
 ax_dish.set_xticks([])
 ax_dish.set_yticks([])
 
-# Right panel - population graph
+# Graph
 ax_graph = fig.add_axes([0.55, 0.28, 0.42, 0.65])
 ax_graph.set_facecolor("#0a0a1a")
 ax_graph.set_title("Population Over Time", color="white", fontsize=12)
@@ -48,7 +48,7 @@ ax_graph.tick_params(colors="white")
 ax_graph.spines[:].set_color("#444")
 
 # Status text below the dish
-ax_status = fig.add_axes([0.03, 0.18, 0.42, 0.08])
+ax_status = fig.add_axes([0.067, 0.2, 0.42, 0.08])
 ax_status.axis("off")
 status_text = ax_status.text(0, 0.5, "", color="white", fontsize=9,
                               verticalalignment="center", family="monospace")
@@ -82,7 +82,7 @@ bacteria_display = ax_dish.imshow(
     vmin=0, vmax=5, interpolation="nearest"
 )
 
-# Nutrient depletion dots — one dot per cell, size shows how depleted it is
+# Nutrient depletion dots 
 dot_x = [x for x in range(GRID_WIDTH) for y in range(GRID_HEIGHT)]
 dot_y = [y for x in range(GRID_WIDTH) for y in range(GRID_HEIGHT)]
 nutrient_dots = ax_dish.scatter(dot_x, dot_y, s=0, color="red", alpha=0.6, zorder=2, marker=".")
@@ -145,7 +145,7 @@ def update(frame):
     bacteria_display.set_data(grid.T)
     bacteria_display.set_clim(0, max(grid.max(), 1))
 
-    # Update nutrient dots — bigger dot = more depleted
+    # Update nutrient dots 
     depletion = 100 - model.nutrients
     sizes = [model.nutrients[x, y] * 0.5 if model.nutrients[x, y] > 5 else 0 for x in range(GRID_WIDTH) for y in range(GRID_HEIGHT)]
     nutrient_dots.set_sizes(sizes)
@@ -178,12 +178,11 @@ def update(frame):
         avg_growth = 0.0
 
     avg_nutrients = float(model.nutrients.mean())
-    warning = "  WARNING: LETHAL TEMP" if model.temperature >= 55 else ""
 
     status_text.set_text(
-        f"Step: {model.step_count}  |  Population: {population}  |  "
-        f"Avg Growth Rate: {avg_growth:.2f}{warning}\n"
-        f"Temp: {model.temperature:.1f}C   pH: {model.ph:.2f}   "
+        f"Step: {model.step_count} | Population: {population} | "
+        f"Avg Growth Rate: {avg_growth:.2f} | "
+        f"Temp: {model.temperature:.1f}C  \n pH: {model.ph:.2f} | "
         f"Avg Nutrients: {avg_nutrients:.1f}"
     )
 
