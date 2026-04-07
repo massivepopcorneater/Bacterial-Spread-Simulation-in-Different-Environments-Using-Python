@@ -17,12 +17,12 @@ sqrt(μ) = b × (T - T_min) × [1 - exp(c × (T - T_max))]
 
 Squaring gives μ. This is then normalised to 0–1 by dividing by μ at T_opt.
 """
-RATKOWSKY_b    = 0.031
-RATKOWSKY_c    = 0.15
+RATKOWSKY_b    = 0.0576
+RATKOWSKY_c    = 0.0048
 
 
 _NORM_T_OPT   = 37.0
-_NORM_T_MIN   = 7.0
+_NORM_T_MIN   = 3.96
 _NORM_T_MAX   = 49.0
 _sq           = RATKOWSKY_b * (_NORM_T_OPT - _NORM_T_MIN) * (
                     1 - math.exp(RATKOWSKY_c * (_NORM_T_OPT - _NORM_T_MAX)))
@@ -124,7 +124,7 @@ class BacteriaAgent(mesa.Agent):
 
     def compute_growth_rate(self):
         """
-        Multiplicative gamma model: growth_rate = temp_factor × pH_factor × nutrient_factor
+        Multiplicative gamma model: growth_rate = temp_factor x pH_factor x nutrient_factor
         """
         temp = self.model.temperature
         ph   = self.model.ph
@@ -140,7 +140,7 @@ class BacteriaAgent(mesa.Agent):
 
     # Lag phase update 
     def update_lag(self):
-        """q accumulates, α = q/(1+q) gates division."""
+        """q accumulates, alpha = q/(1+q) gates division."""
         self.q    += self.growth_rate * self.q
         self.q     = min(self.q, 1000.0)
         self.alpha = self.q / (1.0 + self.q)
@@ -154,12 +154,11 @@ class BacteriaAgent(mesa.Agent):
     # Binary fission 
     def try_divide(self):
         """
-        Biomass accumulates gated by growth_rate × alpha.
+        Biomass accumulates gated by growth_rate x alpha.
         Division fires when biomass >= division_threshold.
         Parent is removed; two daughter cells are created.
         """
-        self.biomass += (self.growth_rate * self.alpha * self.biomass_gain_rate
-)
+        self.biomass += (self.growth_rate * self.alpha * self.biomass_gain_rate)
 
         if self.biomass < self.division_threshold:
             return False
@@ -172,8 +171,9 @@ class BacteriaAgent(mesa.Agent):
         if not empty_cells:
             self.biomass = self.division_threshold * 0.99
             return False
+
         # Biomass division
-        parent_pos  = self.pos
+        parent_pos = self.pos
         daughter_a = BacteriaAgent(self.model, strain=self.strain)
         daughter_a.biomass = self.biomass / 2
         daughter_b = BacteriaAgent(self.model, strain=self.strain)
@@ -181,8 +181,8 @@ class BacteriaAgent(mesa.Agent):
 
         self.model.grid.remove_agent(self)
         self.remove()
-                    
-        # Cell A takes parent's place and cell B takes a random empty neighbouring cell
+
+        # Cell A takes parent's place, cell B takes a random empty neighbouring cell
         self.model.grid.place_agent(daughter_a, parent_pos)
         self.model.grid.place_agent(daughter_b, self.random.choice(empty_cells))
 
@@ -213,13 +213,12 @@ class BacteriaAgent(mesa.Agent):
         self.consume_nutrients()
 
         # Energy 
-        effective_rate = self.growth_rate * self.alpha
-        base_change    = (effective_rate - 0.5) * 20
-        self.energy   += base_change 
-        self.energy    = max(0, min(200, self.energy))
+        base_change = (self.growth_rate - 0.15) * 20
+        self.energy += base_change
+        self.energy  = max(0, min(200, self.energy))
 
         # Cell death
-        if self.age > self.max_age or self.energy <= 0 or self.growth_rate < 0.02:
+        if self.age > self.max_age or self.energy <= 0 or self.growth_rate < 0.001:
             self.model.grid.remove_agent(self)
             self.remove()
             return

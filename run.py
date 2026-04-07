@@ -30,7 +30,7 @@ def create_model():
 # Set up the figure
 fig = plt.figure(figsize=(14, 8))
 fig.canvas.manager.set_window_title("Bacteria Simulation")
-fig.patch.set_facecolor("#1a1a2e")
+fig.patch.set_facecolor("red")
 
 # Simulation
 ax_dish = fig.add_axes([0.03, 0.28, 0.42, 0.65])
@@ -190,7 +190,7 @@ def update(frame):
 
 
 # Start the animation
-anim = animation.FuncAnimation(fig, update, interval=250,
+anim = animation.FuncAnimation(fig, update, interval=100,
                                 blit=False, cache_frame_data=False)
 
 plt.suptitle("Bacteria Spread Simulation - E. coli",
