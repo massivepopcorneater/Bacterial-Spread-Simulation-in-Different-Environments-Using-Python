@@ -77,7 +77,7 @@ STRAINS = {
 }
 
 # Monod half-saturation constant
-MONOD_Ks = 20.0
+MONOD_Ks = 5.0
 
 # Bacteria Unit
 class BacteriaAgent(mesa.Agent):
